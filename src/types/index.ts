@@ -7,8 +7,6 @@ export interface IProductItem {
     price: number | null;
 }
 
-export type IBasketItem = Pick<IProductItem, 'id' | 'title' | 'price'>;
-
 export interface IAppState {
     catalog: IProductItem[];
     basket: string[];
