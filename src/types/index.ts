@@ -4,6 +4,7 @@ export interface IProductItem {
     image: string;
     title: string;
     category: string;
+    status: string;
     price: number | null;
 }
 
@@ -15,8 +16,17 @@ export interface IAppState {
     loading: boolean;
 }
 
+export interface IBasketModel {
+    items: IProductItem[];
+    add(item: IProductItem): void;
+    getItems(): IProductItem[];
+    remove(item: IProductItem): void;
+    getTotal(): number;
+    clearBasket(): void;
+}
+
 export interface IOrderForm {
-    payment: 'Онлайн' | 'При получении';
+    payment: 'card' | 'cash';
     address: string;
     email: string;
     phone: string;

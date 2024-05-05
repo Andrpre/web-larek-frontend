@@ -50,6 +50,12 @@ export abstract class Component<T> {
         }
     }
 
+    // Форматируем цену в нужный формат
+    protected formatPrice = (numb: number): string => {
+        const numbFmt = new Intl.NumberFormat('ru-RU').format(numb);
+        return numbFmt === '0' ? `Бесценно` : `${numbFmt} синапсов`;
+    }
+
     // Вернуть корневой DOM-элемент
     render(data?: Partial<T>): HTMLElement {
         Object.assign(this as object, data ?? {});

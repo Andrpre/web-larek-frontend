@@ -5,39 +5,53 @@ import {CATEGORY_COLORS} from "../utils/constants"
 
 interface ICardActions {
     onClick: (event: MouseEvent) => void;
+    onDelete?: (event: MouseEvent) => void;
 }
 
 export interface ICard<T> {
     title: string;
-    category: string;
+    category?: string;
     description?: string | string[];
-    image: string;
+    image?: string;
+    index?: number;
     price: number | null;
 }
 
 export class Card<T> extends Component<ICard<T>> {
     protected _title: HTMLElement;
-    protected _category: HTMLElement;
-    protected _image: HTMLImageElement;
+    protected _category?: HTMLElement;
+    protected _image?: HTMLImageElement;
     protected _description?: HTMLElement;
     protected _price: HTMLElement;
+    protected _index?: HTMLElement;
+    protected _buttonDelete?: HTMLButtonElement;
     protected _button?: HTMLButtonElement;
 
     constructor(protected blockName: string, container: HTMLElement, actions?: ICardActions) {
         super(container);
 
         this._title = ensureElement<HTMLElement>(`.${blockName}__title`, container);
-        this._category = ensureElement<HTMLElement>(`.${blockName}__category`, container);
-        this._image = ensureElement<HTMLImageElement>(`.${blockName}__image`, container);
-        this._button = container.querySelector(`.${blockName}__button`);
+        // this._category = ensureElement<HTMLElement>(`.${blockName}__category`, container);
+        // this._image = ensureElement<HTMLImageElement>(`.${blockName}__image`, container);
+        this._image = container.querySelector(`.${blockName}__image`);
+        this._category = container.querySelector(`.${blockName}__category`);
+        this._description = container.querySelector(`.${blockName}__text`);
         this._price = container.querySelector(`.${blockName}__price`);
-        this._description = container.querySelector(`.${blockName}__description`);
+        this._button = container.querySelector(`.${blockName}__button`);
+        this._index = container.querySelector(`.basket__item-index`);
+        this._buttonDelete = container.querySelector(`.basket__item-delete`);
 
         if (actions?.onClick) {
             if (this._button) {
                 this._button.addEventListener('click', actions.onClick);
             } else {
                 container.addEventListener('click', actions.onClick);
+            }
+        }
+
+        if (actions?.onDelete) {
+            if (this._buttonDelete) {
+                this._buttonDelete.addEventListener('click', actions.onDelete);
             }
         }
     }
@@ -69,6 +83,17 @@ export class Card<T> extends Component<ICard<T>> {
 
     set price(value: number) {
         this.setText(this._price, this.formatPrice(value));
+        console.log(value);
+        !value ? this.toggleAvailability('Недоступно', true) : '';
+    }
+
+    set index(value: number) {
+        this.setText(this._index, String(value));
+    }
+
+    toggleAvailability(value: string, state: boolean){
+        this.setText(this._button, value);
+        this.setDisabled(this._button, state);
     }
 
     set description(value: string | string[]) {
@@ -81,11 +106,6 @@ export class Card<T> extends Component<ICard<T>> {
         } else {
             this.setText(this._description, value);
         }
-    }
-
-    protected formatPrice = (numb: number): string => {
-        const numbFmt = new Intl.NumberFormat('ru-RU').format(numb);
-        return numbFmt === '0' ? `Бесценно` : `${numbFmt} синапсов`;
     }
     
 }

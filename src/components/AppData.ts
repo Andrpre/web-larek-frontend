@@ -1,7 +1,7 @@
 // import _ from "lodash";
 
 import {Model} from "./base/Model";
-import {FormErrors, IAppState, IProductItem, IOrder, IOrderForm} from "../types";
+import {FormErrors, IAppState, IProductItem, IOrder, IOrderForm, IBasketModel} from "../types";
 
 export type CatalogChangeEvent = {
     catalog: ProductItem[]
@@ -13,15 +13,53 @@ export class ProductItem extends Model<IProductItem> {
     image: string;
     title: string;
     category: string;
+    status: string = "Не добавлен";
     price: number | null;
+
+    toggleStatus (item: IProductItem, isIncluded: boolean){
+        isIncluded ? item.status = "Добавлен" : "Не добавлен";
+        this.emitChanges('preview:changed', item);
+    }
+}
+
+export class BasketModel extends Model<IBasketModel> {
+    items: IProductItem[] = [];
+    
+    add(item: IProductItem) {
+        if(!this.items.some(it => it.id === item.id)) {
+            this.items.push(item);
+            this.emitChanges('basket:changed');
+        }
+    }
+
+    getItems() {
+        return this.items;
+    }
+
+    remove(item: IProductItem) {
+        const index = this.items.findIndex(n => n.id === item.id);
+        this.items.splice(index, 1);
+        item.status = "Не добавлен";
+        this.emitChanges('basket:changed');
+    }
+
+    getTotal() {
+        return this.items.reduce((total, product) => {
+            return total + (product.price || 0)
+        }, 0)
+    }
+
+    clearBasket() {
+        
+    }
 }
 
 export class AppState extends Model<IAppState> {
-    basket: string[];
+    basketItems: ProductItem[];
     catalog: ProductItem[];
     loading: boolean;
     order: IOrder = {
-        payment: 'Онлайн',
+        payment: 'card',
         address: '',
         email: '',
         phone: '',
@@ -58,9 +96,13 @@ export class AppState extends Model<IAppState> {
         this.emitChanges('preview:changed', item);
     }
 
-    // getClosedLots(): ProductItem[] {
-    //     return this.catalog
-    //         .filter(item => item.status === 'closed' && item.isMyBid)
+    // getCartItems(): ProductItem[] {
+    //     return this.basketItems;
+    // }
+
+    // setCartItems(item: ProductItem) {
+    //     this.basketItems.push(item);
+    //     console.log('Добавили в корзину');
     // }
 
     // setOrderField(field: keyof IOrderForm, value: string) {
