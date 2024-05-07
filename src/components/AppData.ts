@@ -17,13 +17,7 @@ export class ProductItem extends Model<IProductItem> {
 	image: string;
 	title: string;
 	category: string;
-	status: string = 'notАdded';
 	price: number | null;
-
-	toggleStatus(item: IProductItem, isIncluded: boolean) {
-		isIncluded ? (item.status = 'added') : 'notАdded';
-		this.emitChanges('preview:changed', item);
-	}
 }
 
 export class AppState extends Model<IAppState> {
@@ -37,13 +31,13 @@ export class AppState extends Model<IAppState> {
 		phone: '',
 		items: [],
 	};
-	preview: string | null;
 	formErrors: FormErrors = {};
 
 	setCartItems(item: IProductItem) {
 		if (!this.basketItems.some((it) => it.id === item.id)) {
 			this.basketItems.push(item);
 			this.emitChanges('basket:changed');
+            this.emitChanges('preview:changed', item);
 		}
 	}
 
@@ -54,7 +48,6 @@ export class AppState extends Model<IAppState> {
 	removeItem(item: IProductItem) {
 		const index = this.basketItems.findIndex((n) => n.id === item.id);
 		this.basketItems.splice(index, 1);
-		item.status = 'notАdded';
 		this.emitChanges('basket:changed');
 	}
 
@@ -73,6 +66,8 @@ export class AppState extends Model<IAppState> {
 
 	clearBasket(): void {
 		this.basketItems.splice(0, this.basketItems.length);
+		this.order.items.splice(0, this.order.items.length);
+        this.order.total = 0;
 	}
 
 	setCatalog(items: IProductItem[]) {
@@ -81,7 +76,6 @@ export class AppState extends Model<IAppState> {
 	}
 
 	setPreview(item: ProductItem) {
-		this.preview = item.id;
 		this.emitChanges('preview:changed', item);
 	}
 
