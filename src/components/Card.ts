@@ -1,7 +1,6 @@
 import {Component} from "./base/Component";
-import {bem, createElement, ensureElement} from "../utils/utils";
+import {ensureElement} from "../utils/utils";
 import {CATEGORY_COLORS} from "../utils/constants"
-// import clsx from "clsx";
 
 interface ICardActions {
     onClick: (event: MouseEvent) => void;
@@ -31,8 +30,6 @@ export class Card<T> extends Component<ICard<T>> {
         super(container);
 
         this._title = ensureElement<HTMLElement>(`.${blockName}__title`, container);
-        // this._category = ensureElement<HTMLElement>(`.${blockName}__category`, container);
-        // this._image = ensureElement<HTMLImageElement>(`.${blockName}__image`, container);
         this._image = container.querySelector(`.${blockName}__image`);
         this._category = container.querySelector(`.${blockName}__category`);
         this._description = container.querySelector(`.${blockName}__text`);
@@ -82,8 +79,9 @@ export class Card<T> extends Component<ICard<T>> {
     }
 
     set price(value: number) {
-        this.setText(this._price, this.formatPrice(value));
-        console.log(value);
+        const numbFrmt = this.formatPrice(value);
+        const numbFrmtText = (numbFrmt === "0 синапсов") ? "Бесценно" : numbFrmt;
+        this.setText(this._price, numbFrmtText);
         !value ? this.toggleAvailability('Недоступно', true) : '';
     }
 

@@ -9,31 +9,23 @@ export interface IProductItem {
 }
 
 export interface IAppState {
+    basketItems: IProductItem[];
     catalog: IProductItem[];
     basket: string[];
     preview: string | null;
     order: IOrder | null;
-    loading: boolean;
-}
-
-export interface IBasketModel {
-    items: IProductItem[];
-    add(item: IProductItem): void;
-    getItems(): IProductItem[];
-    remove(item: IProductItem): void;
-    getTotal(): number;
-    clearBasket(): void;
 }
 
 export interface IOrderForm {
-    payment: 'card' | 'cash';
+    payment: string;
     address: string;
     email: string;
     phone: string;
 }
 
 export interface IOrder extends IOrderForm {
-    items: string[]
+    total: number;
+    items: string[];
 }
 
 export type FormErrors = Partial<Record<keyof IOrder, string>>;

@@ -1,11 +1,12 @@
 import {Component} from "../base/Component";
-import {cloneTemplate, createElement, ensureElement} from "../../utils/utils";
+import {createElement, ensureElement} from "../../utils/utils";
 import {EventEmitter} from "../base/events";
+import { IProductItem } from "../../types";
 
 interface IBasketView {
     items: HTMLElement[];
     price: number;
-    // selected: string[];
+    setCheckout(items: IProductItem[]):void;
 }
 
 export class Basket extends Component<IBasketView> {
@@ -27,6 +28,7 @@ export class Basket extends Component<IBasketView> {
         }
 
         this.items = [];
+        this.setDisabled(this._button, true);
     }
 
     set items(items: HTMLElement[]) {
@@ -43,11 +45,11 @@ export class Basket extends Component<IBasketView> {
         this.setText(this._price, this.formatPrice(price));
     }
 
-    // set selected(items: string[]) {
-    //     if (items.length) {
-    //         this.setDisabled(this._button, false);
-    //     } else {
-    //         this.setDisabled(this._button, true);
-    //     }
-    // }
+    setCheckout(items: IProductItem[]):void {
+        if (items.length) {
+            this.setDisabled(this._button, false);
+        } else {
+            this.setDisabled(this._button, true);
+        }
+    }
 }
