@@ -143,9 +143,9 @@ yarn build
 
 Свойства класса:
 
-- `basketItems: string[]` — массив строк, представляющий элементы в корзине.
-- `catalog: ProductItem[]` — массив объектов `ProductItem`, представляющих элементы каталога.
-- `order: IOrder` —  объект, представляющий заказ, с полями `payment`, `address`, `email`, `total`, `phone` и `items[]`.
+- `basketItems: IProductItem[]` — массив объектов, представляющий элементы в корзине.
+- `catalog: IProductItem[]` — массив объектов, представляющих элементы каталога.
+- `order: IOrderForm` —  объект, представляющий данные заказа, с полями `payment`, `address`, `email`, `phone`.
 - `formErrors: FormErrors` — объект, представляющий ошибки в форме заказа.
 
 Методы класса:
@@ -154,7 +154,7 @@ yarn build
 - `getCartItems(): IProductItem[]` —  возвращает массив товаров из свойства `basketItems` данного класса.
 - `removeItem(item: IProductItem)` — получает на вход объект с данными товара и удаляет его из свойства `basketItems` данного класса.
 - `getTotal(): number` — возвращает общую сумму всех товаров в корзине.
-- `setOrderDeta()` — подготавливает данные перед отправкой заказа на сервер. Все id товаров из свойства `basketItems` добавляет в свойство `order.items`. А также добавляет общую сумму заказа в свойство `order.total`.
+- `getOrderDeta(): IOrder` — возвращает объект с данными о заказе для отправки на сервер.
 - `clearBasket()` —  очищает корзину.
 - `setCatalog(items: IProductItem[])` —  устанавливает каталог товаров, обновляя его элементами из параметра `items`.
 - `setPreview(item: IProductItem)` — инициирует событие на отрисовку модального окна с детализацией информации по конкретному товару.
@@ -162,18 +162,6 @@ yarn build
 - `validateOrder()` — проверяет правильность введенных данных в заказе и обновляет объект `formErrors` с соответствующими ошибками, а затем сообщает об ошибках.
 
 Этот класс обеспечивает управление состоянием приложения, предоставляя методы для изменения данных и проверки их корректности, а также уведомляя другие части приложения о любых изменениях с помощью метода `emitChanges` из класса `Model`.
-
-### 2. Класс `ProductItem`
-
-Класс `ProductItem` расширяет абстрактный класс `Model<IAppState>`, что делает его моделью, предназначенной для управления состоянием продукта.
-
-Класс имеет следующие свойства:
-
-- `id: string;`
-- `description: string;`
-- `image: string;title: string;`
-- `category: string;`
-- `price: number | null;`
 
 ## Компоненты отображения
 
@@ -261,12 +249,8 @@ yarn build
 
 Класс имеет такие сеттеры:
 
-- `items(items: HTMLElement[])` —  устанавливает элементы корзины для отображения. Если элементы есть, они заменяются в списке товаров, иначе отображается сообщение о том, что корзина пуста.
+- `items(items: HTMLElement[])` —  устанавливает элементы корзины для отображения. Если элементы есть, они заменяются в списке товаров, иначе отображается сообщение о том, что корзина пуста. Также управляет состоянием кнопки “*Оформить*”.
 - `total(total: number)` — устанавливает общую сумму покупок в корзине.
-
-И такой метод:
-
-- `setCheckout(items: IProductItem[])` — управляет состоянием кнопки “*Оформить*”. Если в корзине есть товары, то кнопка активна и не активна, если товаров в корзине нет. На вход метод принимает массив объектов, которые типизируются интерфейсом `IProductItem[]`.
 
 ### 6. Класс **`Modal`**
 
@@ -322,13 +306,15 @@ interface IProductItem {
 	category: string;
 	price: number | null;
 }
+
 //Модель для управлния состоянием
 interface IAppState {
 	basketItems: IProductItem[];
 	catalog: IProductItem[];
 	basket: string[];
-	order: IOrder | null;
+	order: IOrderForm | null;
 }
+
 //Данные заказа
 interface IOrderForm {
 	payment: string;
@@ -336,13 +322,16 @@ interface IOrderForm {
 	email: string;
 	phone: string;
 }
+
 //Список товаров в заказе
 interface IOrder extends IOrderForm {
 	total: number;
 	items: string[];
 }
+
 //Ошибки формы
 type FormErrors = Partial<Record<keyof IOrder, string>>;
+
 //Результат заказа
 interface IOrderResult {
     id: string;

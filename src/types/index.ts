@@ -11,7 +11,7 @@ export interface IAppState {
 	basketItems: IProductItem[];
 	catalog: IProductItem[];
 	basket: string[];
-	order: IOrder | null;
+	order: IOrderForm | null;
 }
 
 export interface IOrderForm {

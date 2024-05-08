@@ -8,28 +8,17 @@ import {
 } from '../types';
 
 export type CatalogChangeEvent = {
-	catalog: ProductItem[];
+	catalog: IProductItem[];
 };
-
-export class ProductItem extends Model<IProductItem> {
-	id: string;
-	description: string;
-	image: string;
-	title: string;
-	category: string;
-	price: number | null;
-}
 
 export class AppState extends Model<IAppState> {
 	basketItems: IProductItem[] = [];
-	catalog: ProductItem[];
-	order: IOrder = {
+	catalog: IProductItem[];
+	order: IOrderForm = {
 		payment: 'card',
 		address: '',
 		email: '',
-		total: 0,
 		phone: '',
-		items: [],
 	};
 	formErrors: FormErrors = {};
 
@@ -57,25 +46,27 @@ export class AppState extends Model<IAppState> {
 		}, 0);
 	}
 
-	setOrderDeta(): void {
+	getOrderDeta(): IOrder {
+		const summaryData = this.order as IOrder;
+		summaryData.items = [];
 		this.basketItems.forEach((item) => {
-			this.order.items.push(item.id);
+			summaryData.items.push(item.id);
 		});
-		this.order.total = this.getTotal();
+		summaryData.total = this.getTotal();
+		return summaryData;
 	}
 
 	clearBasket(): void {
 		this.basketItems.splice(0, this.basketItems.length);
-		this.order.items.splice(0, this.order.items.length);
-        this.order.total = 0;
+		this.emitChanges('basket:changed');
 	}
 
 	setCatalog(items: IProductItem[]) {
-		this.catalog = items.map((item) => new ProductItem(item, this.events));
+		this.catalog = items;
 		this.emitChanges('items:changed', { catalog: this.catalog });
 	}
 
-	setPreview(item: ProductItem) {
+	setPreview(item: IProductItem) {
 		this.emitChanges('preview:changed', item);
 	}
 

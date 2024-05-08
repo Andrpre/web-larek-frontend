@@ -1,12 +1,11 @@
 import { Component } from '../base/Component';
 import { createElement, ensureElement } from '../../utils/utils';
-import { EventEmitter } from '../base/events';
+import { EventEmitter } from '../base/Events';
 import { IProductItem } from '../../types';
 
 interface IBasketView {
 	items: HTMLElement[];
 	price: number;
-	setCheckout(items: IProductItem[]): void;
 }
 
 export class Basket extends Component<IBasketView> {
@@ -34,24 +33,18 @@ export class Basket extends Component<IBasketView> {
 	set items(items: HTMLElement[]) {
 		if (items.length) {
 			this._list.replaceChildren(...items);
+			this.setDisabled(this._button, false);
 		} else {
 			this._list.replaceChildren(
 				createElement<HTMLParagraphElement>('p', {
 					textContent: 'Корзина пуста',
 				})
 			);
+			this.setDisabled(this._button, true);
 		}
 	}
 
 	set price(price: number) {
 		this.setText(this._price, this.formatPrice(price));
-	}
-
-	setCheckout(items: IProductItem[]): void {
-		if (items.length) {
-			this.setDisabled(this._button, false);
-		} else {
-			this.setDisabled(this._button, true);
-		}
 	}
 }

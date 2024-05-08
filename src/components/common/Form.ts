@@ -1,5 +1,5 @@
 import { Component } from '../base/Component';
-import { IEvents } from '../base/events';
+import { IEvents } from '../base/Events';
 import { ensureElement } from '../../utils/utils';
 
 interface IFormState {
@@ -50,7 +50,7 @@ export class Form<T> extends Component<IFormState> {
 
 	render(state: Partial<T> & IFormState) {
 		const { valid, errors, ...inputs } = state;
-		super.render({ valid, errors });
+		super.render(state);
 		Object.assign(this, inputs);
 		return this.container;
 	}

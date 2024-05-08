@@ -2,15 +2,14 @@ import './scss/styles.scss';
 
 import { API_URL, CDN_URL } from './utils/constants';
 import { ShopAPI } from './components/ShopAPI';
-import { EventEmitter } from './components/base/events';
+import { EventEmitter } from './components/base/Events';
 import {
 	AppState,
 	CatalogChangeEvent,
-	ProductItem,
 } from './components/AppData';
 import { Page } from './components/Page';
 import { Card } from './components/Card';
-import { cloneTemplate, createElement, ensureElement } from './utils/utils';
+import { cloneTemplate, ensureElement } from './utils/utils';
 import { Modal } from './components/common/Modal';
 import { Basket } from './components/common/Basket';
 import { IProductItem, IOrderForm } from './types';
@@ -32,7 +31,6 @@ const contactsTemplate = ensureElement<HTMLTemplateElement>('#contacts');
 
 // Модели данных приложения
 const appData = new AppState({}, events);
-const product = new ProductItem({}, events);
 
 // Глобальные контейнеры
 const page = new Page(document.body, events);
@@ -76,12 +74,11 @@ events.on('basket:changed', () => {
 		});
 	});
 	basket.price = appData.getTotal();
-	basket.setCheckout(appData.getCartItems());
 	page.counter = appData.getCartItems().length;
 });
 
 // Открыть товар
-events.on('card:select', (item: ProductItem) => {
+events.on('card:select', (item: IProductItem) => {
 	appData.setPreview(item);
 });
 
@@ -119,7 +116,7 @@ events.on('removeFromBasket:changed', (item: IProductItem) => {
 // Открыть корзину
 events.on('basket:open', () => {
 	modal.render({
-		content: createElement<HTMLElement>('div', {}, [basket.render()]),
+		content: basket.render(),
 	});
 });
 
@@ -172,14 +169,13 @@ events.on(
 
 // Отправлена форма заказа
 events.on('contacts:submit', () => {
-	appData.setOrderDeta();
 	api
-		.orderProducts(appData.order)
+		.orderProducts(appData.getOrderDeta())
 		.then((result) => {
+			appData.clearBasket();
 			const success = new Success(cloneTemplate(successTemplate), {
 				onClick: () => {
 					modal.close();
-					appData.clearBasket();
 					events.emit('basket:changed');
 				},
 			});

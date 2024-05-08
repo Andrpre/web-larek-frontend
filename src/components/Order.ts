@@ -1,6 +1,6 @@
 import { Form } from './common/Form';
 import { IOrderForm } from '../types';
-import { IEvents } from './base/events';
+import { IEvents } from './base/Events';
 import { ensureAllElements } from '../utils/utils';
 
 export type TabActions = {
